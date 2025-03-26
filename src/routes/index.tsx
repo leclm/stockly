@@ -4,6 +4,7 @@ import Login from "../pages/Login/Login";
 import Home from "../pages/Home/Home";
 import NotFound from "../pages/NotFound/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
+import Layout from "../components/Layout";
 
 const AppRoutes = () => {
   return (
@@ -15,9 +16,14 @@ const AppRoutes = () => {
       <Route
         path="/home"
         element={
-          <ProtectedRoute element={<Home />} />
+          <ProtectedRoute>
+            <Layout>
+              <Home />
+            </Layout>
+          </ProtectedRoute>
         }
       />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

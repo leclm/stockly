@@ -1,4 +1,3 @@
-// src/pages/NotFound/NotFound.tsx
 import { Container, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -6,7 +5,7 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate("/login");
+    navigate("/home");
   };
 
   return (

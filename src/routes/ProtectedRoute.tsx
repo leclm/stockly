@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { ReactElement, useState, useEffect } from "react";
 import { Snackbar, Alert } from "@mui/material";
 
-const ProtectedRoute = ({ element }: { element: ReactElement }) => {
+const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const isAuthenticated = !!localStorage.getItem("authToken");
@@ -41,7 +41,7 @@ const ProtectedRoute = ({ element }: { element: ReactElement }) => {
     );
   }
 
-  return element;
+  return children;
 };
 
 export default ProtectedRoute;

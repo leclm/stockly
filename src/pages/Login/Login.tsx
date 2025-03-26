@@ -51,6 +51,7 @@ const Login = () => {
       }
 
       localStorage.setItem("authToken", user.token);
+      localStorage.setItem("user", JSON.stringify({ image: user.image, nome: user.nome, sobrenome: user.sobrenome }));
 
       navigate("/home");
     } catch (error) {
