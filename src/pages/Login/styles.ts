@@ -1,7 +1,13 @@
 import { SxProps, Theme } from "@mui/material/styles";
 
-export const newProductStyles = {
+export const loginStyles = {
   container: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+  } as SxProps<Theme>,
+
+  formContainer: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -11,27 +17,36 @@ export const newProductStyles = {
     borderRadius: "8px",
     boxShadow: 3,
     padding: "2rem",
-    margin: "2rem auto",
+    margin: "0 auto",
   } as SxProps<Theme>,
 
   title: {
     marginBottom: "1.5rem",
+    color: "primary.main",
   } as SxProps<Theme>,
 
-  formContainer: {
+  errorText: {
+    marginBottom: "1rem",
+  } as SxProps<Theme>,
+
+  form: {
     width: "100%",
   } as SxProps<Theme>,
 
-  submitButton: {
-    marginTop: "1.5rem",
+  textField: {
+    marginBottom: "1rem",
   } as SxProps<Theme>,
 
-  backButton: {
-    alignSelf: "flex-start",
-    px: 4,
-    py: 1.5,
-    borderRadius: 2,
-    textTransform: "none",
-    fontWeight: 600,
+  submitButton: {
+    marginTop: "1rem",
+  } as SxProps<Theme>,
+
+  registerBox: {
+    marginTop: "1rem",
+    textAlign: "center",
+  } as SxProps<Theme>,
+
+  gridContainer: {
+    width: "100%",
   } as SxProps<Theme>,
 };

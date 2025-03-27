@@ -10,7 +10,7 @@ const NotFound = () => {
 
   return (
     <Container sx={{ textAlign: "center", padding: "2rem" }}>
-      <Typography variant="h4" color="error">
+      <Typography variant="h4" color="error.main">
         Page not found
       </Typography>
       <Typography variant="body1" sx={{ marginTop: "1rem" }}>

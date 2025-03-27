@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { productListStyles } from "./styles";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 interface Product {
   id: string;
@@ -32,15 +33,27 @@ const ProductList = () => {
   const [rowsPerPage] = useState(15);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    fetch("https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product")
+  const { token } = useAuth();
+
+useEffect(() => {
+    if (!token) {
+      console.error("Token is missing, user may not be logged in.");
+      return;
+    }
+
+    fetch("https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
         setFilteredProducts(data);
-      });
-  }, []);
+      })
+      .catch(() => console.error("Error fetching products"));
+  }, [token]);
+
 
   useEffect(() => {
     const filtered = products.filter((product) =>

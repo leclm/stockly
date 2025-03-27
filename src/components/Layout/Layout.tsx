@@ -16,12 +16,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { layoutStyles } from "./styles";
+import { useAuth } from "../../hooks/useAuth";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const { user, logout } = useAuth();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -33,8 +34,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+    logout();
     navigate("/login");
   };
 
@@ -47,7 +47,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
             <ListItemText primary="Home" />
           </ListItemButton>
         </ListItem>
-        <ListItem onClick={() => navigate("/new-product")} sx={layoutStyles.listItem}>
+        <ListItem
+          onClick={() => navigate("/new-product")}
+          sx={layoutStyles.listItem}
+        >
           <ListItemButton component="div">
             <ListItemText primary="New Product" />
           </ListItemButton>

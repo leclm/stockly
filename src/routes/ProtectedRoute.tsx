@@ -1,43 +1,29 @@
 import { Navigate } from "react-router-dom";
 import { ReactElement, useState, useEffect } from "react";
 import { Snackbar, Alert } from "@mui/material";
+import { useAuth } from "../hooks/useAuth";
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
+  const { token } = useAuth();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const isAuthenticated = !!localStorage.getItem("authToken");
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!token) {
       setOpenSnackbar(true);
-
-      setTimeout(() => {
-        setRedirectToLogin(true);
-      }, 3000);
+      setTimeout(() => setRedirectToLogin(true), 3000);
     }
-  }, [isAuthenticated]);
+  }, [token]);
 
-  if (redirectToLogin) {
-    return <Navigate to="/login" replace />;
-  }
+  if (redirectToLogin) return <Navigate to="/login" replace />;
 
-  if (!isAuthenticated) {
+  if (!token) {
     return (
-      <>
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={3000}
-          onClose={() => setOpenSnackbar(false)}
-        >
-          <Alert
-            onClose={() => setOpenSnackbar(false)}
-            severity="error"
-            sx={{ width: "100%" }}
-          >
-            You need to be logged in to access this page!
-          </Alert>
-        </Snackbar>
-      </>
+      <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity="error" sx={{ width: "100%" }}>
+          You need to be logged in to access this page!
+        </Alert>
+      </Snackbar>
     );
   }
 

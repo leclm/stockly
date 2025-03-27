@@ -5,8 +5,8 @@ import Home from "../pages/Home/Home";
 import NotFound from "../pages/NotFound/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout/Layout";
-import ProductDetails from "../pages/ProductDetails";
-import NewProduct from "../pages/NewProduct";
+import ProductDetails from "../pages/ProductDetails/ProductDetails";
+import NewProduct from "../pages/NewProduct/NewProduct";
 
 const AppRoutes = () => {
   return (

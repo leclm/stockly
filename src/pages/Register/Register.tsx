@@ -11,13 +11,17 @@ import {
   MenuItem,
   Link,
 } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cpf } from "cpf-cnpj-validator";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import ptBR from "date-fns/locale/pt-BR";
 import { useForm, Controller } from "react-hook-form";
+import { registerStyles } from "./styles";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
   interface FormData {
@@ -45,40 +49,36 @@ const Register = () => {
     setValue,
   } = useForm<FormData>();
 
-  const [, setLoadingAddress] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Função para gerar um token único
   const generateToken = () => {
-    return crypto.randomUUID(); // Gera um UUID
+    return crypto.randomUUID();
   };
 
-  // Função para buscar o endereço usando o ViaCEP
+  const [loading, setLoading] = useState(false);
+  const loadingAddress = useRef(false);
+  const navigate = useNavigate();
+
   const handleCepChange = async (cep: string) => {
     if (cep.length === 8) {
-      setLoadingAddress(true);
+      loadingAddress.current = true;
+
       try {
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const addressData = await response.json();
         if (!addressData.erro) {
-          // Preenche os campos automaticamente com os dados recebidos
           setValue("logradouro", addressData.logradouro);
           setValue("bairro", addressData.bairro);
           setValue("cidade", addressData.localidade);
           setValue("estado", addressData.uf);
-          setLoadingAddress(false);
         } else {
-          alert("CEP não encontrado");
-          setLoadingAddress(false);
+          alert("Zip code not found");
         }
       } catch (error) {
-        alert(`Erro ao buscar CEP: ${error}`);
-        setLoadingAddress(false);
+        alert(`Error searching for zip code: ${error}`);
+        loadingAddress.current = false;
       }
     }
   };
 
-  // Monitorar o valor do campo 'logradouro'
   const logradouroValue = watch("logradouro");
   const bairroValue = watch("bairro");
   const cidadeValue = watch("cidade");
@@ -119,55 +119,40 @@ const Register = () => {
 
       if (response.ok) {
         const result = await response.json();
-        alert(`Usuário registrado: ${result.nome} ${result.sobrenome}`);
-        console.log("Usuário registrado:", result);
+        toast.success(
+          `Successfully registered ${result.nome} ${result.sobrenome}`
+        );
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } else {
-        alert("Erro ao registrar o usuário");
+        toast.error("Error registering user");
       }
-    } catch (error) {
-      alert(`Erro ao conectar com a API: ${error}`);
+    } catch {
+      toast.error("Error connecting to API");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container
-      maxWidth="xs"
-      sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: 3,
-          padding: "2rem",
-          margin: "0 auto",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{ marginBottom: "1.5rem", color: "#2c3e50" }}
-        >
+    <Container maxWidth="xs" sx={registerStyles.container}>
+      <Box sx={registerStyles.formContainer}>
+        <Typography variant="h4" sx={registerStyles.title}>
           Register
         </Typography>
         <Box
           component="form"
           onSubmit={handleSubmit(onSubmit)}
-          sx={{ width: "100%" }}
+          sx={registerStyles.form}
         >
-          <Grid container spacing={2}>
+          <Grid container spacing={2} sx={registerStyles.gridContainer}>
             <Grid item xs={6}>
               <TextField
                 fullWidth
                 label="First Name"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("firstname", {
                   required: "First Name is required",
                 })}
@@ -180,7 +165,7 @@ const Register = () => {
                 fullWidth
                 label="Last Name"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("lastname", { required: "Last Name is required" })}
                 error={!!errors.lastname}
                 helperText={errors.lastname?.message}
@@ -191,7 +176,7 @@ const Register = () => {
                 fullWidth
                 label="CPF"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("cpf", {
                   required: "CPF is required",
                   validate: (value) => cpf.isValid(value) || "Invalid CPF",
@@ -206,7 +191,7 @@ const Register = () => {
                 label="Email"
                 type="email"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("email", { required: "Email is required" })}
                 error={!!errors.email}
                 helperText={errors.email?.message}
@@ -218,7 +203,7 @@ const Register = () => {
                 label="Password"
                 type="password"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("password", { required: "Password is required" })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
@@ -228,7 +213,7 @@ const Register = () => {
               <FormControl
                 fullWidth
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.formControl}
               >
                 <InputLabel>Gender</InputLabel>
                 <Controller
@@ -273,6 +258,7 @@ const Register = () => {
                       slotProps={{
                         textField: {
                           fullWidth: true,
+                          sx: registerStyles.textField,
                           error: !!errors.birthdate,
                           helperText: errors.birthdate?.message,
                         },
@@ -285,10 +271,10 @@ const Register = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="CEP"
+                label="ZIP Code"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
-                {...register("cep", { required: "CEP is required" })}
+                sx={registerStyles.textField}
+                {...register("cep", { required: "ZIP Code is required" })}
                 onBlur={(e) => handleCepChange(e.target.value)}
                 error={!!errors.cep}
                 helperText={
@@ -303,7 +289,7 @@ const Register = () => {
                 fullWidth
                 label={logradouroValue ? "" : "Address"}
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("logradouro")}
                 disabled
               />
@@ -313,7 +299,7 @@ const Register = () => {
                 fullWidth
                 label={bairroValue ? "" : "Neighborhood"}
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("bairro")}
                 disabled
               />
@@ -323,7 +309,7 @@ const Register = () => {
                 fullWidth
                 label={cidadeValue ? "" : "City"}
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("cidade")}
                 disabled
               />
@@ -333,7 +319,7 @@ const Register = () => {
                 fullWidth
                 label={estadoValue ? "" : "State"}
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("estado")}
                 disabled
               />
@@ -343,7 +329,7 @@ const Register = () => {
                 fullWidth
                 label="Complement"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={registerStyles.textField}
                 {...register("complement", {
                   required: "Complement is required",
                 })}
@@ -357,13 +343,13 @@ const Register = () => {
             fullWidth
             variant="contained"
             color="primary"
-            sx={{ marginTop: "1rem" }}
+            sx={registerStyles.submitButton}
             type="submit"
             disabled={loading}
           >
             {loading ? "Registering..." : "Register"}
           </Button>
-          <Box sx={{ marginTop: "1rem", textAlign: "center" }}>
+          <Box sx={registerStyles.loginBox}>
             <Typography variant="body2">
               Already have an account?{" "}
               <Link href="/login" color="primary">
@@ -373,6 +359,7 @@ const Register = () => {
           </Box>
         </Box>
       </Box>
+      <ToastContainer />
     </Container>
   );
 };

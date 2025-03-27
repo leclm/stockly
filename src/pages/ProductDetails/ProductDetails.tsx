@@ -12,6 +12,8 @@ import {
   DialogActions,
 } from "@mui/material";
 import { productDetailsStyles } from "./styles";
+import { toast } from "react-toastify";
+import { useAuth } from "../../hooks/useAuth";
 
 interface Product {
   id: string;
@@ -29,11 +31,24 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [openModal, setOpenModal] = useState(false);
 
+  const { token } = useAuth();
+
   useEffect(() => {
-    fetch(`https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`)
+    if (!token) {
+      toast.error("You must be logged in to view product details.");
+      navigate("/login");
+      return;
+    }
+
+    fetch(`https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
-      .then((data) => setProduct(data));
-  }, [id]);
+      .then((data) => setProduct(data))
+      .catch(() => toast.error("Error fetching product details"));
+  }, [id, token, navigate]);
 
   if (!product) {
     return <Typography>Loading...</Typography>;
@@ -54,11 +69,17 @@ const ProductDetails = () => {
         `https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      navigate("/home");
-    } catch (error) {
-      console.error("Error removing product:", error);
+      toast.success("Product deleted successfully!");
+      navigate("/home", {
+        state: { successMessage: "Product deleted successfully!" },
+      });
+    } catch {
+      toast.error("Error deleting product");
     }
   };
 

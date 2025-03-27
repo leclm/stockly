@@ -56,7 +56,6 @@ export const layoutStyles = {
   } as SxProps<Theme>,
 
   menuButton: {
-    color: 'text.secondary',
     '&:hover': {
       color: 'primary.main',
     },

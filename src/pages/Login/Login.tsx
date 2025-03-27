@@ -1,20 +1,16 @@
-import {
-  TextField,
-  Button,
-  Container,
-  Box,
-  Grid,
-  Typography,
-  Link,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { TextField, Button, Container, Box, Grid, Typography, Link } from "@mui/material";
+import { loginStyles } from "./styles";
+import { useAuth } from "../../hooks/useAuth";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -36,7 +32,7 @@ const Login = () => {
       );
       const users = await response.json();
 
-      if (users.length === 0) {
+      if (users.length === 0 || users[0].senha !== data.password) {
         setError("Incorrect email or password.");
         setLoading(false);
         return;
@@ -44,71 +40,41 @@ const Login = () => {
 
       const user = users[0];
 
-      if (user.senha !== data.password) {
-        setError("Incorrect email or password.");
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("authToken", user.token);
-      localStorage.setItem("user", JSON.stringify({ image: user.image, nome: user.nome, sobrenome: user.sobrenome }));
+      login(user.token, { 
+        image: user.image, 
+        nome: user.nome, 
+        sobrenome: user.sobrenome 
+      });
 
       navigate("/home");
-    } catch (error) {
-      setError(`Error when trying to login: ${error}`);
+    } catch {
+      setError("Error when trying to login");
       setLoading(false);
     }
   };
 
   return (
-    <Container
-      maxWidth="xs"
-      sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: 3,
-          padding: "2rem",
-          margin: "0 auto",
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{ marginBottom: "1.5rem", color: "#2c3e50" }}
-        >
+    <Container maxWidth="xs" sx={loginStyles.container}>
+      <Box sx={loginStyles.formContainer}>
+        <Typography variant="h4" sx={loginStyles.title}>
           Login
         </Typography>
 
         {error && (
-          <Typography
-            variant="body2"
-            color="error"
-            sx={{ marginBottom: "1rem" }}
-          >
+          <Typography variant="body2" color="error" sx={loginStyles.errorText}>
             {error}
           </Typography>
         )}
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit(onSubmit)}
-          sx={{ width: "100%" }}
-        >
-          <Grid container spacing={2}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={loginStyles.form}>
+          <Grid container spacing={2} sx={loginStyles.gridContainer}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Email"
                 type="email"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={loginStyles.textField}
                 {...register("email", { required: "Email is required" })}
                 error={!!errors.email}
                 helperText={errors.email?.message}
@@ -121,7 +87,7 @@ const Login = () => {
                 label="Password"
                 type="password"
                 variant="outlined"
-                sx={{ marginBottom: "1rem" }}
+                sx={loginStyles.textField}
                 {...register("password", { required: "Password is required" })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
@@ -133,16 +99,16 @@ const Login = () => {
                 fullWidth
                 variant="contained"
                 color="primary"
-                sx={{ marginTop: "1rem" }}
+                sx={loginStyles.submitButton}
                 type="submit"
                 disabled={loading}
               >
-                {loading ? "Fazendo Login..." : "Login"}
+                {loading ? "Loading..." : "Login"}
               </Button>
             </Grid>
           </Grid>
 
-          <Box sx={{ marginTop: "1rem", textAlign: "center" }}>
+          <Box sx={loginStyles.registerBox}>
             <Typography variant="body2">
               Don't have an account?{" "}
               <Link href="/register" color="primary">

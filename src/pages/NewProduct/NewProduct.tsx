@@ -1,3 +1,5 @@
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   TextField,
   Button,
@@ -11,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { newProductStyles } from "./styles";
+import { useAuth } from "../../hooks/useAuth";
 
 interface ProductFormData {
   imagem: FileList;
@@ -24,6 +27,7 @@ interface ProductFormData {
 const NewProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [, setProductData] = useState<ProductFormData | null>(null);
 
@@ -37,7 +41,14 @@ const NewProduct = () => {
 
   useEffect(() => {
     if (id) {
-      fetch(`https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`)
+      fetch(
+        `https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
         .then((response) => response.json())
         .then((data) => {
           setProductData(data);
@@ -47,7 +58,7 @@ const NewProduct = () => {
           setValue("qt_estoque", data.qt_estoque);
           setValue("marca", data.marca);
         })
-        .catch((error) => alert("Error fetching product data: " + error));
+        .catch(() => toast.error("Error fetching product data"));
     } else {
       reset({
         imagem: undefined,
@@ -58,7 +69,7 @@ const NewProduct = () => {
         marca: "",
       });
     }
-  }, [id, setValue, reset]);
+  }, [id, setValue, reset, token]);
 
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
@@ -76,19 +87,28 @@ const NewProduct = () => {
       const url = id
         ? `https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`
         : "https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product";
+
       const response = await fetch(url, {
         method,
         body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
-        alert(id ? "Product updated successfully!" : "Product created successfully!");
-        navigate("/home");
+        toast.success(
+          id ? "Product updated successfully!" : "Product created successfully!"
+        );
+        
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
       } else {
-        alert("Error saving product.");
+        toast.error("Error saving product");
       }
-    } catch (error) {
-      alert(`Error connecting to API: ${error}`);
+    } catch {
+      toast.error("Error connecting to API");
     } finally {
       setLoading(false);
     }
@@ -96,25 +116,16 @@ const NewProduct = () => {
 
   return (
     <Container maxWidth="sm">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: 3,
-          padding: "2rem",
-          margin: "2rem auto",
-        }}
-      >
-        <Typography variant="h4" sx={{ marginBottom: "1.5rem" }}>
+      <Box sx={newProductStyles.container}>
+        <Typography variant="h4" sx={newProductStyles.title}>
           {id ? "Edit Product" : "New Product"}
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: "100%" }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={newProductStyles.formContainer}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -147,7 +158,9 @@ const NewProduct = () => {
                 error={!!errors.preco}
                 helperText={errors.preco?.message}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                  startAdornment: (
+                    <InputAdornment position="start">R$</InputAdornment>
+                  ),
                 }}
               />
             </Grid>
@@ -177,11 +190,7 @@ const NewProduct = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <input
-                type="file"
-                accept="image/*"
-                {...register("imagem")}
-              />
+              <input type="file" accept="image/*" {...register("imagem")} />
             </Grid>
           </Grid>
 
@@ -189,7 +198,7 @@ const NewProduct = () => {
             fullWidth
             variant="contained"
             color="primary"
-            sx={{ marginTop: "1.5rem" }}
+            sx={newProductStyles.submitButton}
             type="submit"
             disabled={loading}
           >
@@ -204,6 +213,8 @@ const NewProduct = () => {
       >
         Back
       </Button>
+
+      <ToastContainer />
     </Container>
   );
 };
