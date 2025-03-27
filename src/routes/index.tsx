@@ -6,6 +6,7 @@ import NotFound from "../pages/NotFound/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout/Layout";
 import ProductDetails from "../pages/ProductDetails";
+import NewProduct from "../pages/NewProduct";
 
 const AppRoutes = () => {
   return (
@@ -30,6 +31,16 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Layout>
               <ProductDetails  />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/new-product"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <NewProduct  />
             </Layout>
           </ProtectedRoute>
         }

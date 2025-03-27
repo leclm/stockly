@@ -47,14 +47,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
             <ListItemText primary="Home" />
           </ListItemButton>
         </ListItem>
-        <ListItem onClick={() => navigate("/home")} sx={layoutStyles.listItem}>
+        <ListItem onClick={() => navigate("/new-product")} sx={layoutStyles.listItem}>
           <ListItemButton component="div">
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem onClick={() => navigate("/home")} sx={layoutStyles.listItem}>
-          <ListItemButton component="div">
-            <ListItemText primary="Home" />
+            <ListItemText primary="New Product" />
           </ListItemButton>
         </ListItem>
       </Drawer>

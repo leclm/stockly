@@ -1,8 +1,11 @@
 import { Box, Button } from "@mui/material";
 import ProductList from "../../components/ProductList/ProductList";
 import { homeStyles } from "./styles";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+  
   return (
     <Box sx={homeStyles.root}>
       <Box sx={homeStyles.content}>
@@ -10,7 +13,7 @@ const Home = () => {
           <Box component="h1" sx={homeStyles.title}>
             Product list
           </Box>
-          <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary"  onClick={() => navigate("/new-product")}>
             New Product
           </Button>
         </Box>
