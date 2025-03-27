@@ -45,6 +45,16 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/new-product/:id"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <NewProduct  />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
       
       <Route path="*" element={<NotFound />} />
     </Routes>

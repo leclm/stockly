@@ -8,9 +8,9 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { newProductStyles } from "./styles";
-import { useNavigate } from "react-router-dom";
 
 interface ProductFormData {
   imagem: FileList;
@@ -23,19 +23,48 @@ interface ProductFormData {
 
 const NewProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState(false);
+  const [, setProductData] = useState<ProductFormData | null>(null);
+
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm<ProductFormData>();
 
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (id) {
+      fetch(`https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setProductData(data);
+          setValue("nome", data.nome);
+          setValue("preco", data.preco);
+          setValue("qt_vendas", data.qt_vendas);
+          setValue("qt_estoque", data.qt_estoque);
+          setValue("marca", data.marca);
+        })
+        .catch((error) => alert("Error fetching product data: " + error));
+    } else {
+      reset({
+        imagem: undefined,
+        nome: "",
+        preco: "",
+        qt_vendas: 0,
+        qt_estoque: 0,
+        marca: "",
+      });
+    }
+  }, [id, setValue, reset]);
 
   const onSubmit = async (data: ProductFormData) => {
     setLoading(true);
 
     const formData = new FormData();
-    formData.append("imagem", data.imagem[0]);
+    if (data.imagem.length > 0) formData.append("imagem", data.imagem[0]);
     formData.append("nome", data.nome);
     formData.append("preco", data.preco.replace("R$", "").trim());
     formData.append("qt_vendas", data.qt_vendas.toString());
@@ -43,18 +72,20 @@ const NewProduct = () => {
     formData.append("marca", data.marca);
 
     try {
-      const response = await fetch(
-        "https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const method = id ? "PUT" : "POST";
+      const url = id
+        ? `https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product/${id}`
+        : "https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product";
+      const response = await fetch(url, {
+        method,
+        body: formData,
+      });
 
       if (response.ok) {
-        alert("Product created successfully!");
+        alert(id ? "Product updated successfully!" : "Product created successfully!");
+        navigate("/home");
       } else {
-        alert("Error creating product.");
+        alert("Error saving product.");
       }
     } catch (error) {
       alert(`Error connecting to API: ${error}`);
@@ -80,19 +111,15 @@ const NewProduct = () => {
         }}
       >
         <Typography variant="h4" sx={{ marginBottom: "1.5rem" }}>
-          New Product
+          {id ? "Edit Product" : "New Product"}
         </Typography>
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit(onSubmit)}
-          sx={{ width: "100%" }}
-        >
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: "100%" }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Name"
+                label={id ? "" : "Name"}
                 variant="outlined"
                 {...register("nome", { required: "Name is required" })}
                 error={!!errors.nome}
@@ -103,11 +130,9 @@ const NewProduct = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Brand"
+                label={id ? "" : "Brand"}
                 variant="outlined"
-                {...register("marca", {
-                  required: "Brand is required",
-                })}
+                {...register("marca", { required: "Brand is required" })}
                 error={!!errors.marca}
                 helperText={errors.marca?.message}
               />
@@ -122,9 +147,7 @@ const NewProduct = () => {
                 error={!!errors.preco}
                 helperText={errors.preco?.message}
                 InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">R$</InputAdornment>
-                  ),
+                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
                 }}
               />
             </Grid>
@@ -133,12 +156,9 @@ const NewProduct = () => {
               <TextField
                 fullWidth
                 type="number"
-                label="Sales quantity"
+                label={id ? "" : "Sales quantity"}
                 variant="outlined"
-                {...register("qt_vendas", {
-                  required: "Sales is required",
-                  min: { value: 0, message: "Cannot be negative" },
-                })}
+                {...register("qt_vendas", { required: "Sales is required" })}
                 error={!!errors.qt_vendas}
                 helperText={errors.qt_vendas?.message}
               />
@@ -148,12 +168,9 @@ const NewProduct = () => {
               <TextField
                 fullWidth
                 type="number"
-                label="Stock quantity"
+                label={id ? "" : "Stock quantity"}
                 variant="outlined"
-                {...register("qt_estoque", {
-                  required: "Stock is required",
-                  min: { value: 0, message: "Cannot be negative" },
-                })}
+                {...register("qt_estoque", { required: "Stock is required" })}
                 error={!!errors.qt_estoque}
                 helperText={errors.qt_estoque?.message}
               />
@@ -163,13 +180,8 @@ const NewProduct = () => {
               <input
                 type="file"
                 accept="image/*"
-                {...register("imagem", { required: "Image is required" })}
+                {...register("imagem")}
               />
-              {errors.imagem && (
-                <Typography color="error" variant="body2">
-                  {errors.imagem.message}
-                </Typography>
-              )}
             </Grid>
           </Grid>
 
@@ -181,10 +193,10 @@ const NewProduct = () => {
             type="submit"
             disabled={loading}
           >
-            {loading ? "Creating..." : "Create"}
+            {loading ? "Saving..." : id ? "Update" : "Create"}
           </Button>
         </Box>
-      </Box>{" "}
+      </Box>
       <Button
         variant="outlined"
         sx={newProductStyles.backButton}

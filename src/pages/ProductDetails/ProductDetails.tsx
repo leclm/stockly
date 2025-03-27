@@ -72,18 +72,19 @@ const ProductDetails = () => {
           <Box sx={productDetailsStyles.buttonGroup}>
             <Button
               variant="contained"
+              color="primary"
+              sx={{ textTransform: "none", fontWeight: 600 }}
+              onClick={() => navigate(`/new-product/${id}`)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="contained"
               color="error"
               sx={{ textTransform: "none", fontWeight: 600 }}
               onClick={() => setOpenModal(true)}
             >
               Delete
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ textTransform: "none", fontWeight: 600 }}
-            >
-              Edit
             </Button>
           </Box>
         </Box>

@@ -251,27 +251,6 @@ const Register = () => {
               </FormControl>
             </Grid>
 
-            {/* <Grid item xs={12}>
-              <LocalizationProvider
-                dateAdapter={AdapterDateFns}
-                adapterLocale={ptBR}
-              >
-                <Controller
-                  name="birthdate"
-                  control={control}
-                  defaultValue={undefined}
-                  rules={{ required: "Birthdate is required" }}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Date of Birth"
-                      value={field.value ? new Date(field.value) : null}
-                      onChange={(newValue) => field.onChange(newValue)}
-                      slotProps={{ textField: { fullWidth: true } }}
-                    />
-                  )}
-                />
-              </LocalizationProvider>
-            </Grid> */}
             <Grid item xs={12}>
               <LocalizationProvider
                 dateAdapter={AdapterDateFns}
