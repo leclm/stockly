@@ -12,14 +12,11 @@ export const homeStyles = {
   } as SxProps<Theme>,
 
   title: {
-    fontSize: '2.5rem',
+    typography: 'h4',
     fontWeight: 700,
-    color: 'primary.main',
-    mb: 4,
-    textAlign: 'left',
-    letterSpacing: '-0.5px',
-    background: 'linear-gradient(to right, #3a86ff, #8338ec)',
+    color: 'text.primary',
     WebkitBackgroundClip: 'text',
+    lineHeight: 1.2,
   } as SxProps<Theme>,
 
   content: {

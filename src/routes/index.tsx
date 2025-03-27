@@ -5,6 +5,7 @@ import Home from "../pages/Home/Home";
 import NotFound from "../pages/NotFound/NotFound";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout/Layout";
+import ProductDetails from "../pages/ProductDetails";
 
 const AppRoutes = () => {
   return (
@@ -19,6 +20,16 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Layout>
               <Home />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/product/:id"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProductDetails  />
             </Layout>
           </ProtectedRoute>
         }

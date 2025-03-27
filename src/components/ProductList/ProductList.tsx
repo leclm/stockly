@@ -13,6 +13,7 @@ import {
   TablePagination,
 } from "@mui/material";
 import { productListStyles } from "./styles";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: string;
@@ -30,7 +31,8 @@ const ProductList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(15);
   const [search, setSearch] = useState("");
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     fetch("https://67ddc6fd471aaaa7428282c2.mockapi.io/api/v1/product")
       .then((response) => response.json())
@@ -50,7 +52,10 @@ const ProductList = () => {
   const formatPrice = (price: string) => {
     const number = parseFloat(price);
     if (isNaN(number)) return "R$ 0,00";
-    return number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return number.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
   };
 
   return (
@@ -63,7 +68,7 @@ const ProductList = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      
+
       <TableContainer>
         <Table>
           <TableHead sx={productListStyles.tableHeader}>
@@ -77,16 +82,16 @@ const ProductList = () => {
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-          
+
           <TableBody>
             {filteredProducts
               .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
               .map((product) => (
                 <TableRow key={product.id} sx={productListStyles.tableRow}>
                   <TableCell>
-                    <Avatar 
-                      src={product.image} 
-                      alt={product.nome} 
+                    <Avatar
+                      src={product.image}
+                      alt={product.nome}
                       sx={productListStyles.avatar}
                       variant="rounded"
                     />
@@ -97,9 +102,10 @@ const ProductList = () => {
                   <TableCell>{product.qt_vendas}</TableCell>
                   <TableCell>{product.marca}</TableCell>
                   <TableCell>
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       sx={productListStyles.detailButton}
+                      onClick={() => navigate(`/product/${product.id}`)}
                     >
                       Details
                     </Button>
@@ -109,7 +115,7 @@ const ProductList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      
+
       <TablePagination
         component="div"
         count={filteredProducts.length}
