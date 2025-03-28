@@ -74,7 +74,6 @@ const ProductDetails = () => {
           },
         }
       );
-      toast.success("Product deleted successfully!");
       navigate("/home", {
         state: { successMessage: "Product deleted successfully!" },
       });
