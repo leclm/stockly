@@ -11,6 +11,10 @@ import {
   Button,
   TextField,
   TablePagination,
+  useMediaQuery,
+  useTheme,
+  Box,
+  Typography,
 } from "@mui/material";
 import { productListStyles } from "./styles";
 import { useNavigate } from "react-router-dom";
@@ -34,8 +38,10 @@ const ProductList = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { token } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-useEffect(() => {
+  useEffect(() => {
     if (!token) {
       console.error("Token is missing, user may not be logged in.");
       return;
@@ -53,7 +59,6 @@ useEffect(() => {
       })
       .catch(() => console.error("Error fetching products"));
   }, [token]);
-
 
   useEffect(() => {
     const filtered = products.filter((product) =>
@@ -84,44 +89,99 @@ useEffect(() => {
 
       <TableContainer>
         <Table>
-          <TableHead sx={productListStyles.tableHeader}>
-            <TableRow>
-              <TableCell>Image</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Stock</TableCell>
-              <TableCell>Sales</TableCell>
-              <TableCell>Brand</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
+          {!isMobile && (
+            <TableHead sx={productListStyles.tableHeader}>
+              <TableRow>
+                <TableCell>Image</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Stock</TableCell>
+                <TableCell>Sales</TableCell>
+                <TableCell>Brand</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+          )}
 
           <TableBody>
             {filteredProducts
               .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
               .map((product) => (
-                <TableRow key={product.id} sx={productListStyles.tableRow}>
-                  <TableCell>
-                    <Avatar
-                      src={product.image}
-                      alt={product.nome}
-                      sx={productListStyles.avatar}
-                      variant="rounded"
-                    />
+                <TableRow key={product.id} sx={isMobile ? productListStyles.mobileRow : productListStyles.tableRow}>
+                  {isMobile && (
+                    <TableCell>
+                      <Box sx={productListStyles.mobileRowHeader}>
+                        <Avatar
+                          src={product.image}
+                          alt={product.nome}
+                          sx={productListStyles.avatar}
+                          variant="rounded"
+                        />
+                        <Typography sx={productListStyles.mobileProductName}>
+                          {product.nome}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  )}
+
+                  {!isMobile && (
+                    <TableCell>
+                      <Avatar
+                        src={product.image}
+                        alt={product.nome}
+                        sx={productListStyles.avatar}
+                        variant="rounded"
+                      />
+                    </TableCell>
+                  )}
+
+                  {!isMobile && <TableCell>{product.nome}</TableCell>}
+
+                  <TableCell sx={isMobile ? null : productListStyles.responsiveTableCell}>
+                    {isMobile && <Box component="span" sx={productListStyles.mobileLabel}>Price:</Box>}
+                    <Typography variant="body2" sx={{ fontWeight: isMobile ? 500 : 'inherit' }}>
+                      {formatPrice(product.preco)}
+                    </Typography>
                   </TableCell>
-                  <TableCell>{product.nome}</TableCell>
-                  <TableCell>{formatPrice(product.preco)}</TableCell>
-                  <TableCell>{product.qt_estoque}</TableCell>
-                  <TableCell>{product.qt_vendas}</TableCell>
-                  <TableCell>{product.marca}</TableCell>
+
+                  <TableCell sx={isMobile ? null : productListStyles.responsiveTableCell}>
+                    {isMobile && <Box component="span" sx={productListStyles.mobileLabel}>Stock:</Box>}
+                    {product.qt_estoque}
+                  </TableCell>
+
+                  <TableCell sx={isMobile ? null : productListStyles.responsiveTableCell}>
+                    {isMobile && <Box component="span" sx={productListStyles.mobileLabel}>Sales:</Box>}
+                    {product.qt_vendas}
+                  </TableCell>
+
+                  <TableCell sx={isMobile ? null : productListStyles.responsiveTableCell}>
+                    {isMobile && <Box component="span" sx={productListStyles.mobileLabel}>Brand:</Box>}
+                    {product.marca}
+                  </TableCell>
+
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      sx={productListStyles.detailButton}
-                      onClick={() => navigate(`/product/${product.id}`)}
-                    >
-                      Details
-                    </Button>
+                    {isMobile ? (
+                      <Box sx={productListStyles.mobileDetailButton}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          fullWidth
+                          sx={productListStyles.detailButton}
+                          onClick={() => navigate(`/product/${product.id}`)}
+                        >
+                          View Details
+                        </Button>
+                      </Box>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        sx={productListStyles.detailButton}
+                        onClick={() => navigate(`/product/${product.id}`)}
+                      >
+                        Details
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

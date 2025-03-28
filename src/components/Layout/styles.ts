@@ -7,34 +7,49 @@ export const layoutStyles = {
   } as SxProps<Theme>,
 
   drawer: {
-    width: 240,
+    width: { xs: 56, sm: 240 },
     flexShrink: 0,
     '& .MuiDrawer-paper': {
-      width: 240,
+      width: { xs: 56, sm: 240 },
       boxSizing: 'border-box',
       borderRight: 'none',
       backgroundColor: 'primary.dark',
       boxShadow: 1,
+      overflowX: 'hidden',
+      transition: 'width 0.3s ease',
     },
   } as SxProps<Theme>,
-  
+
   listItem: {
     color: 'background.paper',
     '&:hover': {
       backgroundColor: 'primary.main',
     },
     py: 1.5,
-    px: 3,
+    px: { xs: 0, sm: 3 },
+    whiteSpace: 'nowrap',
+  } as SxProps<Theme>,
+
+  listItemText: {
+    display: { xs: 'none', sm: 'block' },
+  } as SxProps<Theme>,
+
+  listItemIcon: {
+    minWidth: { xs: 'auto', sm: 56 },
+    color: 'inherit',
   } as SxProps<Theme>,
 
   mainContent: {
     flexGrow: 1,
     backgroundColor: 'background.default',
+    p: { xs: 2, sm: 3 },
+    width: { xs: 'calc(100% - 56px)', sm: 'calc(100% - 240px)' },
   } as SxProps<Theme>,
 
   appBar: {
-    mb: 3,
-    pr: 3,
+    mb: { xs: 2, sm: 3 },
+    pr: { xs: 2, sm: 3 },
+    pl: { xs: 2, sm: 3 },
     backgroundColor: 'background.paper',
     color: 'text.primary',
     boxShadow: 1,
@@ -45,8 +60,8 @@ export const layoutStyles = {
     alignItems: 'center',
     width: '100%',
     justifyContent: 'space-between',
-    pl: 0,
-    pr: 0,
+    pl: { xs: 1, sm: 0 },
+    pr: { xs: 1, sm: 0 },
   } as SxProps<Theme>,
 
   avatar: {
@@ -61,4 +76,9 @@ export const layoutStyles = {
     },
   } as SxProps<Theme>,
 
+  mobileMenuButton: {
+    display: { sm: 'none' },
+    color: 'background.paper',
+    mr: 1,
+  } as SxProps<Theme>,
 };

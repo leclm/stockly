@@ -8,6 +8,7 @@ import {
   Box,
   Grid,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
@@ -75,7 +76,7 @@ const NewProduct = () => {
     setLoading(true);
 
     const formData = new FormData();
-    if (data.imagem.length > 0) formData.append("imagem", data.imagem[0]);
+    if (data.imagem?.length > 0) formData.append("imagem", data.imagem[0]);
     formData.append("nome", data.nome);
     formData.append("preco", data.preco.replace("R$", "").trim());
     formData.append("qt_vendas", data.qt_vendas.toString());
@@ -115,10 +116,10 @@ const NewProduct = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md" sx={{ py: { xs: 0, sm: 2 } }}>
       <Box sx={newProductStyles.container}>
         <Typography variant="h4" sx={newProductStyles.title}>
-          {id ? "Edit Product" : "New Product"}
+          {id ? "Edit Product" : "Create New Product"}
         </Typography>
 
         <Box
@@ -127,29 +128,31 @@ const NewProduct = () => {
           sx={newProductStyles.formContainer}
         >
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={newProductStyles.gridItem}>
               <TextField
                 fullWidth
-                label={id ? "" : "Name"}
+                label="Product Name"
                 variant="outlined"
                 {...register("nome", { required: "Name is required" })}
                 error={!!errors.nome}
                 helperText={errors.nome?.message}
+                sx={newProductStyles.textField}
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={newProductStyles.gridItem}>
               <TextField
                 fullWidth
-                label={id ? "" : "Brand"}
+                label="Brand"
                 variant="outlined"
                 {...register("marca", { required: "Brand is required" })}
                 error={!!errors.marca}
                 helperText={errors.marca?.message}
+                sx={newProductStyles.textField}
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={newProductStyles.gridItem}>
               <TextField
                 fullWidth
                 label="Price"
@@ -162,35 +165,55 @@ const NewProduct = () => {
                     <InputAdornment position="start">R$</InputAdornment>
                   ),
                 }}
+                sx={newProductStyles.textField}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} sx={newProductStyles.gridItem}>
               <TextField
                 fullWidth
                 type="number"
-                label={id ? "" : "Sales quantity"}
+                label="Sales Quantity"
                 variant="outlined"
-                {...register("qt_vendas", { required: "Sales is required" })}
+                {...register("qt_vendas", { 
+                  required: "Sales is required",
+                  min: { value: 0, message: "Must be positive" }
+                })}
                 error={!!errors.qt_vendas}
                 helperText={errors.qt_vendas?.message}
+                sx={newProductStyles.textField}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} sx={newProductStyles.gridItem}>
               <TextField
                 fullWidth
                 type="number"
-                label={id ? "" : "Stock quantity"}
+                label="Stock Quantity"
                 variant="outlined"
-                {...register("qt_estoque", { required: "Stock is required" })}
+                {...register("qt_estoque", { 
+                  required: "Stock is required",
+                  min: { value: 0, message: "Must be positive" }
+                })}
                 error={!!errors.qt_estoque}
                 helperText={errors.qt_estoque?.message}
+                sx={newProductStyles.textField}
               />
             </Grid>
 
-            <Grid item xs={12}>
-              <input type="file" accept="image/*" {...register("imagem")} />
+            <Grid item xs={12} sx={newProductStyles.gridItem}>
+              <Box component="label">
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                  Product Image
+                </Typography>
+                <Box
+                  component="input"
+                  type="file"
+                  accept="image/*"
+                  {...register("imagem")}
+                  sx={newProductStyles.fileInput}
+                />
+              </Box>
             </Grid>
           </Grid>
 
@@ -201,20 +224,23 @@ const NewProduct = () => {
             sx={newProductStyles.submitButton}
             type="submit"
             disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
           >
-            {loading ? "Saving..." : id ? "Update" : "Create"}
+            {loading ? "Processing..." : id ? "Update Product" : "Create Product"}
           </Button>
         </Box>
       </Box>
+      
       <Button
         variant="outlined"
+        color="primary"
         sx={newProductStyles.backButton}
         onClick={() => navigate(-1)}
       >
-        Back
+        Back to List
       </Button>
 
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </Container>
   );
 };
