@@ -150,6 +150,7 @@ const NewProduct = () => {
                 error={!!errors.nome}
                 helperText={errors.nome?.message}
                 sx={newProductStyles.textField}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
 
@@ -162,6 +163,7 @@ const NewProduct = () => {
                 error={!!errors.marca}
                 helperText={errors.marca?.message}
                 sx={newProductStyles.textField}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
 
@@ -179,6 +181,7 @@ const NewProduct = () => {
                   ),
                 }}
                 sx={newProductStyles.textField}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
 
@@ -195,6 +198,7 @@ const NewProduct = () => {
                 error={!!errors.qt_vendas}
                 helperText={errors.qt_vendas?.message}
                 sx={newProductStyles.textField}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
 
@@ -211,6 +215,7 @@ const NewProduct = () => {
                 error={!!errors.qt_estoque}
                 helperText={errors.qt_estoque?.message}
                 sx={newProductStyles.textField}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
 
