@@ -17,7 +17,7 @@ import { newProductStyles } from "./styles";
 import { useAuth } from "../../hooks/useAuth";
 
 interface ProductFormData {
-  imagem: FileList;
+  imagem: File | null;
   nome: string;
   preco: string;
   qt_vendas: number;
@@ -31,6 +31,7 @@ const NewProduct = () => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [, setProductData] = useState<ProductFormData | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const {
     register,
@@ -58,6 +59,7 @@ const NewProduct = () => {
           setValue("qt_vendas", data.qt_vendas);
           setValue("qt_estoque", data.qt_estoque);
           setValue("marca", data.marca);
+          setImagePreview(data.image);
         })
         .catch(() => toast.error("Error fetching product data"));
     } else {
@@ -69,6 +71,7 @@ const NewProduct = () => {
         qt_estoque: 0,
         marca: "",
       });
+      setImagePreview(null);
     }
   }, [id, setValue, reset, token]);
 
@@ -76,7 +79,9 @@ const NewProduct = () => {
     setLoading(true);
 
     const formData = new FormData();
-    if (data.imagem?.length > 0) formData.append("imagem", data.imagem[0]);
+    if (data.imagem) {
+      formData.append("image", data.imagem);
+    }
     formData.append("nome", data.nome);
     formData.append("preco", data.preco.replace("R$", "").trim());
     formData.append("qt_vendas", data.qt_vendas.toString());
@@ -101,7 +106,7 @@ const NewProduct = () => {
         toast.success(
           id ? "Product updated successfully!" : "Product created successfully!"
         );
-        
+
         setTimeout(() => {
           navigate("/home");
         }, 2000);
@@ -112,6 +117,14 @@ const NewProduct = () => {
       toast.error("Error connecting to API");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+      setValue("imagem", file as File);
     }
   };
 
@@ -175,9 +188,9 @@ const NewProduct = () => {
                 type="number"
                 label="Sales Quantity"
                 variant="outlined"
-                {...register("qt_vendas", { 
+                {...register("qt_vendas", {
                   required: "Sales is required",
-                  min: { value: 0, message: "Must be positive" }
+                  min: { value: 0, message: "Must be positive" },
                 })}
                 error={!!errors.qt_vendas}
                 helperText={errors.qt_vendas?.message}
@@ -191,9 +204,9 @@ const NewProduct = () => {
                 type="number"
                 label="Stock Quantity"
                 variant="outlined"
-                {...register("qt_estoque", { 
+                {...register("qt_estoque", {
                   required: "Stock is required",
-                  min: { value: 0, message: "Must be positive" }
+                  min: { value: 0, message: "Must be positive" },
                 })}
                 error={!!errors.qt_estoque}
                 helperText={errors.qt_estoque?.message}
@@ -202,17 +215,38 @@ const NewProduct = () => {
             </Grid>
 
             <Grid item xs={12} sx={newProductStyles.gridItem}>
-              <Box component="label">
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                  Product Image
-                </Typography>
-                <Box
-                  component="input"
-                  type="file"
-                  accept="image/*"
-                  {...register("imagem")}
-                  sx={newProductStyles.fileInput}
-                />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Box>
+                  {imagePreview && (
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", mb: 2 }}
+                    >
+                      <img
+                        src={imagePreview}
+                        alt="Product Preview"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+                <Box component="label">
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                    Product Image
+                  </Typography>
+                  <Box
+                    component="input"
+                    type="file"
+                    accept="image/*"
+                    {...register("imagem")}
+                    onChange={handleImageChange}
+                    sx={newProductStyles.fileInput}
+                  />
+                </Box>
               </Box>
             </Grid>
           </Grid>
@@ -224,13 +258,19 @@ const NewProduct = () => {
             sx={newProductStyles.submitButton}
             type="submit"
             disabled={loading}
-            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+            startIcon={
+              loading ? <CircularProgress size={20} color="inherit" /> : null
+            }
           >
-            {loading ? "Processing..." : id ? "Update Product" : "Create Product"}
+            {loading
+              ? "Processing..."
+              : id
+              ? "Update Product"
+              : "Create Product"}
           </Button>
         </Box>
       </Box>
-      
+
       <Button
         variant="outlined"
         color="primary"
@@ -240,7 +280,7 @@ const NewProduct = () => {
         Back to List
       </Button>
 
-      <ToastContainer position="bottom-right" autoClose={3000} />
+      <ToastContainer autoClose={3000} />
     </Container>
   );
 };
